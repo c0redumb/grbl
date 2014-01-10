@@ -181,4 +181,82 @@
 #endif
 */
 
+#ifdef PIN_MAP_PRO_MICRO
+
+  // Serial port pins (no need)
+  //#define SERIAL_RX USART0_RX_vect
+  //#define SERIAL_UDRE USART0_UDRE_vect
+
+  // Increase Buffers to make use of extra SRAM
+  //#define RX_BUFFER_SIZE 256
+  //#define TX_BUFFER_SIZE 128
+  //#define BLOCK_BUFFER_SIZE 36
+  //#define LINE_BUFFER_SIZE 100
+
+  // NOTE: All step bit and direction pins must be on the same port.
+  #define STEPPING_DDR      DDRB
+  #define STEPPING_PORT     PORTB
+  #define STEPPING_PIN      PINB
+  #define X_STEP_BIT        2 // Pro Micro Pin 11
+  #define Y_STEP_BIT        1 // Pro Micro Pin 9
+  #define Z_STEP_BIT        5 // Pro Micro Pin 1
+  #define X_DIRECTION_BIT   6 // Pro Micro Pin 12
+  #define Y_DIRECTION_BIT   3 // Pro Micro Pin 10
+  #define Z_DIRECTION_BIT   4 // Pro Micro Pin 2
+  #define STEP_MASK ((1<<X_STEP_BIT)|(1<<Y_STEP_BIT)|(1<<Z_STEP_BIT)) // All step bits
+  #define DIRECTION_MASK ((1<<X_DIRECTION_BIT)|(1<<Y_DIRECTION_BIT)|(1<<Z_DIRECTION_BIT)) // All direction bits
+  #define STEPPING_MASK (STEP_MASK | DIRECTION_MASK) // All stepping-related bits (step/direction)
+
+  #define STEPPERS_DISABLE_DDR   DDRE
+  #define STEPPERS_DISABLE_PORT  PORTE
+  #define STEPPERS_DISABLE_BIT   6 // Pro Micro Pin 3
+  #define STEPPERS_DISABLE_MASK (1<<STEPPERS_DISABLE_BIT)
+
+  // NOTE: All limit bit pins must be on the same port
+  #define LIMIT_DDR       DDRD
+  #define LIMIT_PORT      PORTD
+  #define LIMIT_PIN       PIND
+  #define X_LIMIT_BIT     4 // Pro Micro Pin 6
+  #define Y_LIMIT_BIT     0 // Pro Micro Pin 7
+  #define Z_LIMIT_BIT     1 // Pro Micro Pin 8
+  #define LIMIT_INT       PCIE0  // Pin change interrupt enable pin
+  #define LIMIT_INT_vect  PCINT0_vect 
+  #define LIMIT_PCMSK     PCMSK0 // Pin change interrupt register
+  #define LIMIT_MASK ((1<<X_LIMIT_BIT)|(1<<Y_LIMIT_BIT)|(1<<Z_LIMIT_BIT)) // All limit bits
+
+  #define SPINDLE_ENABLE_DDR   DDRC
+  #define SPINDLE_ENABLE_PORT  PORTC
+  #define SPINDLE_ENABLE_BIT   6 // Pro Micro Pin 5
+
+  #define SPINDLE_DIRECTION_DDR   DDRD
+  #define SPINDLE_DIRECTION_PORT  PORTD
+  #define SPINDLE_DIRECTION_BIT   7 // Pro Micro Pin 4
+
+  #define COOLANT_FLOOD_DDR   DDRF
+  #define COOLANT_FLOOD_PORT  PORTF
+  #define COOLANT_FLOOD_BIT   7 // Pro Micro Pin 8
+
+  // #define ENABLE_M7  // Mist coolant disabled by default. Uncomment to enable.
+  // Not enough pins for it.
+  #ifdef ENABLE_M7
+    #define COOLANT_MIST_DDR   DDRC
+    #define COOLANT_MIST_PORT  PORTC
+    #define COOLANT_MIST_BIT   3 // MEGA2560 Digital Pin 34
+  #endif  
+
+  // NOTE: All pinouts pins must be on the same port
+  #define PINOUT_DDR       DDRF
+  #define PINOUT_PIN       PINF
+  #define PINOUT_PORT      PORTF
+  #define PIN_RESET        4  // Pro Micro Pin 5
+  #define PIN_FEED_HOLD    5  // Pro Micro Pin 6
+  #define PIN_CYCLE_START  6  // Pro Micro Pin 7
+  #define PINOUT_INT       PCIE2  // Pin change interrupt enable pin
+  #define PINOUT_INT_vect  PCINT2_vect
+  #define PINOUT_PCMSK     PCMSK2 // Pin change interrupt register
+  #define PINOUT_MASK ((1<<PIN_RESET)|(1<<PIN_FEED_HOLD)|(1<<PIN_CYCLE_START))
+
+#endif
+
+
 #endif
