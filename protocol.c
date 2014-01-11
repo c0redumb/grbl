@@ -51,8 +51,14 @@ void protocol_init()
   
   PINOUT_DDR &= ~(PINOUT_MASK); // Set as input pins
   PINOUT_PORT |= PINOUT_MASK; // Enable internal pull-up resistors. Normal high operation.
+#ifndef PIN_MAP_ARDUINO_PRO_MICRO
   PINOUT_PCMSK |= PINOUT_MASK;   // Enable specific pins of the Pin Change Interrupt
   PCICR |= (1 << PINOUT_INT);   // Enable Pin Change Interrupt
+#else
+	PINOUT_EIMSK &= ~(PINOUT_MASK);	// Disable the interrupt before configure the trigger
+	PINOUT_EICR = PINOUT_EICR_val;	// Set external interrupt to level trigger
+	PINOUT_EIMSK |= PINOUT_MASK;		// Enable the external interrupt
+#endif
 }
 
 // Executes user startup script, if stored.
@@ -78,6 +84,7 @@ void protocol_execute_startup()
 ISR(PINOUT_INT_vect) 
 {
   // Enter only if any pinout pin is actively low.
+#ifndef PIN_MAP_ARDUINO_PRO_MICRO
   if ((PINOUT_PIN & PINOUT_MASK) ^ PINOUT_MASK) { 
     if (bit_isfalse(PINOUT_PIN,bit(PIN_RESET))) {
       mc_reset();
@@ -87,6 +94,9 @@ ISR(PINOUT_INT_vect)
       sys.execute |= EXEC_CYCLE_START;
     }
   }
+#else
+	mc_reset();
+#endif
 }
 
 // Executes run-time commands, when required. This is called from various check points in the main

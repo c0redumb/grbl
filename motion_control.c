@@ -215,7 +215,9 @@ void mc_dwell(float seconds)
 void mc_go_home()
 {
   sys.state = STATE_HOMING; // Set system state variable
+#ifndef PIN_MAP_ARDUINO_PRO_MICRO
   LIMIT_PCMSK &= ~LIMIT_MASK; // Disable hard limits pin change register for cycle duration
+#endif
   
   limits_go_home(); // Perform homing routine.
 
@@ -254,7 +256,11 @@ void mc_go_home()
   sys_sync_current_position();
 
   // If hard limits feature enabled, re-enable hard limits pin change register after homing cycle.
-  if (bit_istrue(settings.flags,BITFLAG_HARD_LIMIT_ENABLE)) { LIMIT_PCMSK |= LIMIT_MASK; }
+  if (bit_istrue(settings.flags,BITFLAG_HARD_LIMIT_ENABLE)) {
+#ifndef PIN_MAP_ARDUINO_PRO_MICRO
+    LIMIT_PCMSK |= LIMIT_MASK;
+#endif
+  }
   // Finished! 
 }
 

@@ -181,7 +181,7 @@
 #endif
 */
 
-#ifdef PIN_MAP_PRO_MICRO
+#ifdef PIN_MAP_ARDUINO_PRO_MICRO
 
   // Serial port pins (no need)
   //#define SERIAL_RX USART0_RX_vect
@@ -207,9 +207,9 @@
   #define DIRECTION_MASK ((1<<X_DIRECTION_BIT)|(1<<Y_DIRECTION_BIT)|(1<<Z_DIRECTION_BIT)) // All direction bits
   #define STEPPING_MASK (STEP_MASK | DIRECTION_MASK) // All stepping-related bits (step/direction)
 
-  #define STEPPERS_DISABLE_DDR   DDRE
-  #define STEPPERS_DISABLE_PORT  PORTE
-  #define STEPPERS_DISABLE_BIT   6 // Pro Micro Pin 3
+  #define STEPPERS_DISABLE_DDR   DDRC
+  #define STEPPERS_DISABLE_PORT  PORTC
+  #define STEPPERS_DISABLE_BIT   6 // Pro Micro Pin 5
   #define STEPPERS_DISABLE_MASK (1<<STEPPERS_DISABLE_BIT)
 
   // NOTE: All limit bit pins must be on the same port
@@ -219,43 +219,50 @@
   #define X_LIMIT_BIT     4 // Pro Micro Pin 6
   #define Y_LIMIT_BIT     0 // Pro Micro Pin 7
   #define Z_LIMIT_BIT     1 // Pro Micro Pin 8
-  #define LIMIT_INT       PCIE0  // Pin change interrupt enable pin
-  #define LIMIT_INT_vect  PCINT0_vect 
-  #define LIMIT_PCMSK     PCMSK0 // Pin change interrupt register
+	// Note: For ATmega32u4, the pin change interrupt can only be on PortB.
+	// But PortB is the only port wide enough for stepper motor driving.
+	// So the limit bit pin interrupts are not used.
+  //#define LIMIT_INT       PCIE0  // Pin change interrupt enable pin
+  //#define LIMIT_INT_vect  PCINT0_vect 
+  //#define LIMIT_PCMSK     PCMSK0 // Pin change interrupt register
   #define LIMIT_MASK ((1<<X_LIMIT_BIT)|(1<<Y_LIMIT_BIT)|(1<<Z_LIMIT_BIT)) // All limit bits
 
-  #define SPINDLE_ENABLE_DDR   DDRC
-  #define SPINDLE_ENABLE_PORT  PORTC
-  #define SPINDLE_ENABLE_BIT   6 // Pro Micro Pin 5
+  #define SPINDLE_ENABLE_DDR   DDRF
+  #define SPINDLE_ENABLE_PORT  PORTF
+  #define SPINDLE_ENABLE_BIT   4 // Pro Micro Pin 5
 
-  #define SPINDLE_DIRECTION_DDR   DDRD
-  #define SPINDLE_DIRECTION_PORT  PORTD
-  #define SPINDLE_DIRECTION_BIT   7 // Pro Micro Pin 4
+  #define SPINDLE_DIRECTION_DDR   DDRF
+  #define SPINDLE_DIRECTION_PORT  PORTF
+  #define SPINDLE_DIRECTION_BIT   5 // Pro Micro Pin 6
 
   #define COOLANT_FLOOD_DDR   DDRF
   #define COOLANT_FLOOD_PORT  PORTF
-  #define COOLANT_FLOOD_BIT   7 // Pro Micro Pin 8
+  #define COOLANT_FLOOD_BIT   6 // Pro Micro Pin 7
 
   // #define ENABLE_M7  // Mist coolant disabled by default. Uncomment to enable.
   // Not enough pins for it.
   #ifdef ENABLE_M7
-    #define COOLANT_MIST_DDR   DDRC
-    #define COOLANT_MIST_PORT  PORTC
-    #define COOLANT_MIST_BIT   3 // MEGA2560 Digital Pin 34
+    #define COOLANT_MIST_DDR   DDRF
+    #define COOLANT_MIST_PORT  PORTF
+    #define COOLANT_MIST_BIT   7 // Pro Micro Pin 8
   #endif  
 
   // NOTE: All pinouts pins must be on the same port
-  #define PINOUT_DDR       DDRF
-  #define PINOUT_PIN       PINF
-  #define PINOUT_PORT      PORTF
-  #define PIN_RESET        4  // Pro Micro Pin 5
-  #define PIN_FEED_HOLD    5  // Pro Micro Pin 6
-  #define PIN_CYCLE_START  6  // Pro Micro Pin 7
-  #define PINOUT_INT       PCIE2  // Pin change interrupt enable pin
-  #define PINOUT_INT_vect  PCINT2_vect
-  #define PINOUT_PCMSK     PCMSK2 // Pin change interrupt register
-  #define PINOUT_MASK ((1<<PIN_RESET)|(1<<PIN_FEED_HOLD)|(1<<PIN_CYCLE_START))
-
+  // For ATmega32u4, all pin change interrupts are on Port B.
+  // Since Port B is the only port wide enough for stepper motor
+  // controls, only external interrputs can be used for pinout.
+  // For now, only the RESET pinout is implemented on PE6.
+  #define PINOUT_DDR        DDRE
+  //#define PINOUT_PIN      PINE    // Not used
+  #define PINOUT_PORT       PORTE
+  #define PIN_RESET         6       // Pro Micro Pin 3
+  //#define PIN_FEED_HOLD   5       // Not used
+  //#define PIN_CYCLE_START 6       // Not used
+  #define PINOUT_EIMSK      EIMSK   // External interrupt mask
+  #define PINOUT_MASK       (1<<PIN_RESET)
+  #define PINOUT_EICR       EICRB   // External interrput control register
+  #define PINOUT_EICR_val   0       // Setting interrput to be level triggered
+  #define PINOUT_INT_vect   INT6_vect
 #endif
 
 
